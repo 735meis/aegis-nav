@@ -43,9 +43,9 @@ interface StarResult {
 // ── Teammate stub hooks — wire your endpoints here ────────────────────────────
 
 async function fetchHazards(): Promise<HazardNode[]> {
-  // TODO (teammate): replace with GET /api/get-hazards
-  // Expected shape: { hazards: HazardNode[] }
-  return []
+  const res  = await fetch(`${API}/api/get-hazards`)
+  const data = await res.json()
+  return data.hazards ?? []
 }
 
 async function fetchQuantumRoute(
@@ -53,9 +53,13 @@ async function fetchQuantumRoute(
   _end:     { x: number; y: number },
   _hazards: HazardNode[],
 ): Promise<RouteNode[]> {
-  // TODO (teammate): replace with GET /api/get-route
-  // Expected shape: { route: RouteNode[] }
-  return []
+  const res  = await fetch(`${API}/api/get-route`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ start: _start, target: _end, hazards: _hazards }),
+  })
+  const data = await res.json()
+  return data.route ?? []
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
