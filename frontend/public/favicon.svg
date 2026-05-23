@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <rect width="48" height="48" fill="#03030a"/>
+  <!-- Ship body -->
+  <polygon points="38,24 14,14 14,34" fill="none" stroke="#00ccff" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Engine glow -->
+  <circle cx="14" cy="24" r="5" fill="#00ccff22" stroke="#00ccff" stroke-width="1"/>
+  <!-- Solar panels -->
+  <rect x="10" y="8"  width="8" height="3" fill="#00ccff44" stroke="#00ccff" stroke-width="0.8"/>
+  <rect x="10" y="37" width="8" height="3" fill="#00ccff44" stroke="#00ccff" stroke-width="0.8"/>
+  <!-- Glow dot -->
+  <circle cx="38" cy="24" r="2" fill="#00ff88" filter="url(#g)"/>
+  <defs>
+    <filter id="g"><feGaussianBlur stdDeviation="1.5"/></filter>
+  </defs>
+</svg>

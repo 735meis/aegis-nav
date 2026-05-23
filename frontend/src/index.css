@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Base overrides for Mission Control aesthetic */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #03030a;
+  color: #e2e8f0;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Neon glow utility classes */
+.glow-green  { box-shadow: 0 0 8px #00ff88, 0 0 20px #00ff8844; }
+.glow-red    { box-shadow: 0 0 8px #ff2222, 0 0 20px #ff222244; }
+.glow-cyan   { box-shadow: 0 0 8px #00ccff, 0 0 20px #00ccff44; }
+.glow-amber  { box-shadow: 0 0 8px #ffaa00, 0 0 20px #ffaa0044; }
+
+.text-glow-green { text-shadow: 0 0 8px #00ff88; }
+.text-glow-red   { text-shadow: 0 0 8px #ff2222; }
+.text-glow-cyan  { text-shadow: 0 0 8px #00ccff; }
+
+/* Scrollbar styling for terminal log */
+.terminal-scroll::-webkit-scrollbar       { width: 4px; }
+.terminal-scroll::-webkit-scrollbar-track { background: #0a0a0f; }
+.terminal-scroll::-webkit-scrollbar-thumb { background: #00ccff44; border-radius: 2px; }
