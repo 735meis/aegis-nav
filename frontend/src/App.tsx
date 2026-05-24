@@ -721,9 +721,10 @@ export default function App() {
     let starResult: StarResult
     try {
       const res = await fetch(`${API}/api/classify-star`)
+      if (!res.ok) throw new Error(`API error ${res.status}`)
       starResult = await res.json()
-    } catch {
-      addLog('ERROR', 'Backend unreachable. Is uvicorn running on port 8000?')
+    } catch (err) {
+      addLog('ERROR', `API unreachable — ${err instanceof Error ? err.message : 'network error'}`)
       setPhase('NOMINAL'); return
     }
     setTimings(prev => ({ ...prev, p1: `${((Date.now() - t1) / 1000).toFixed(2)}s` }))
