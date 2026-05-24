@@ -427,7 +427,7 @@ export default function LandingPage() {
 
         {/* Section label */}
         <div style={{ marginBottom: 40, textAlign: 'center' }}>
-          <span className="section-label">Live Demo · Built at Hackathon 2025</span>
+          <span className="section-label">Live Demo · Built at Hackathon 2026</span>
         </div>
 
         {/* Animated preview card */}
