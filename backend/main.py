@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from prong1_classifier import get_safe_star_coordinate
+from prong1_classifier import get_safe_star_coordinate, get_quantum_proof
 from prong2_hazards import get_active_hazards
 from prong3_router import calculate_quantum_path
 
@@ -47,6 +47,12 @@ def classify_star():
     return result
 
 
+@app.get("/api/quantum-circuit")
+def quantum_circuit():
+    """Returns the actual Qiskit circuit diagram and VQC training metadata."""
+    return get_quantum_proof()
+
+
 # ── Prong 2: NASA Hazard Mapping ──────────────────────────────────────────────
 
 def _threat_level(weight: int) -> str:
@@ -70,6 +76,7 @@ def get_hazards():
                 "y":      h["y"],
                 "threat": _threat_level(h["threat_weight"]),
                 "label":  h["name"],
+                "type":   h.get("type", "asteroid"),
             }
             for h in raw
         ]
@@ -85,6 +92,8 @@ class RouteRequest(BaseModel):
     target:  dict
     hazards: list
 
+_THREAT_TO_WEIGHT = {"high": 9, "medium": 5, "low": 2}
+
 @app.post("/api/get-route")
 def get_route(req: RouteRequest):
     """
@@ -92,7 +101,12 @@ def get_route(req: RouteRequest):
     from start to target, avoiding all hazard nodes.
     """
     try:
-        route = calculate_quantum_path(req.start, req.target, req.hazards)
+        # prong3_router expects numeric threat_weight; frontend sends string threat
+        normalized_hazards = [
+            {**h, "threat_weight": _THREAT_TO_WEIGHT.get(h.get("threat", "medium"), 5)}
+            for h in req.hazards
+        ]
+        route = calculate_quantum_path(req.start, req.target, normalized_hazards)
         total_distance = sum(
             math.sqrt((route[i+1]["x"] - route[i]["x"])**2 + (route[i+1]["y"] - route[i]["y"])**2)
             for i in range(len(route) - 1)

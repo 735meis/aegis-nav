@@ -9,13 +9,15 @@ from qiskit_algorithms import QAOA
 from qiskit_algorithms.optimizers import COBYLA
 from qiskit.primitives import StatevectorSampler
 
-NUM_WAYPOINTS = 8   # 8 binary qubits — fast on local StatevectorSampler
+NUM_WAYPOINTS = 6   # 6 binary qubits — single-arc corridor, fast on StatevectorSampler
 BASE_REWARD = 5.0   # small incentive to select a hazard-free waypoint
 HAZARD_PENALTY = 150.0  # dominates BASE_REWARD when near a hazard
 DIST_WEIGHT = 0.05  # light distance cost between adjacent waypoints
 QAOA_REPS = 1       # p=1 QAOA layer; sufficient for demo, compiles in seconds
 
-# ── B-2: Generate 8 candidate waypoints in two parallel corridor rows ─────────
+# ── B-2: Generate 6 candidate waypoints along a single offset arc ────────────
+# Single corridor (no two-row zigzag) so assemble_path never crosses the
+# direct axis and connecting segments stay clear of on-axis hazards.
 
 def generate_waypoints(start: dict, target: dict, n: int = NUM_WAYPOINTS) -> list[tuple[int, int]]:
     sx, sy = start["x"], start["y"]
@@ -23,27 +25,16 @@ def generate_waypoints(start: dict, target: dict, n: int = NUM_WAYPOINTS) -> lis
     dx, dy = tx - sx, ty - sy
     length = math.sqrt(dx * dx + dy * dy) or 1.0
 
-    # Perpendicular unit vector (rotated 90° CCW)
+    # Perpendicular unit vector (rotated 90° CCW) — offset to one side only
     px, py = -dy / length, dx / length
-    offset = 10.0  # grid units away from the direct axis
+    offset = 20.0  # grid units perpendicular to the direct axis
 
-    half = n // 2
     waypoints: list[tuple[int, int]] = []
-
-    # Row 1: above the start→target axis
-    for i in range(half):
-        t = (i + 1) / (half + 1)
+    for i in range(n):
+        t = (i + 1) / (n + 1)
         ax, ay = sx + t * dx, sy + t * dy
         wx = int(min(max(round(ax + offset * px), 0), 99))
         wy = int(min(max(round(ay + offset * py), 0), 99))
-        waypoints.append((wx, wy))
-
-    # Row 2: below the start→target axis
-    for i in range(half):
-        t = (i + 1) / (half + 1)
-        ax, ay = sx + t * dx, sy + t * dy
-        wx = int(min(max(round(ax - offset * px), 0), 99))
-        wy = int(min(max(round(ay - offset * py), 0), 99))
         waypoints.append((wx, wy))
 
     return waypoints
@@ -56,7 +47,7 @@ def compute_hazard_penalty(wx: int, wy: int, hazards: list[dict]) -> float:
         dist = math.sqrt((wx - h["x"]) ** 2 + (wy - h["y"]) ** 2)
         if dist < 12:
             total += HAZARD_PENALTY * h["threat_weight"]
-        elif dist < 20:
+        elif dist < 15:
             total += HAZARD_PENALTY * h["threat_weight"] * 0.3
     return total
 
@@ -64,7 +55,6 @@ def compute_hazard_penalty(wx: int, wy: int, hazards: list[dict]) -> float:
 
 def build_qubo(waypoints: list[tuple[int, int]], hazard_nodes: list[dict]) -> QuadraticProgram:
     n = len(waypoints)
-    half = n // 2
     qp = QuadraticProgram("aegis_route")
 
     for i in range(n):
@@ -76,19 +66,9 @@ def build_qubo(waypoints: list[tuple[int, int]], hazard_nodes: list[dict]) -> Qu
         penalty = compute_hazard_penalty(wx, wy, hazard_nodes)
         linear[f"x{i}"] = penalty - BASE_REWARD
 
-    # Quadratic terms: small distance cost between consecutive waypoints in same row
+    # Quadratic terms: distance cost between consecutive waypoints (single arc)
     quadratic: dict[tuple[str, str], float] = {}
-
-    # Row 1 adjacency: x0–x1, x1–x2, x2–x3
-    for i in range(half - 1):
-        d = math.sqrt(
-            (waypoints[i][0] - waypoints[i + 1][0]) ** 2
-            + (waypoints[i][1] - waypoints[i + 1][1]) ** 2
-        )
-        quadratic[(f"x{i}", f"x{i + 1}")] = d * DIST_WEIGHT
-
-    # Row 2 adjacency: x4–x5, x5–x6, x6–x7
-    for i in range(half, n - 1):
+    for i in range(n - 1):
         d = math.sqrt(
             (waypoints[i][0] - waypoints[i + 1][0]) ** 2
             + (waypoints[i][1] - waypoints[i + 1][1]) ** 2

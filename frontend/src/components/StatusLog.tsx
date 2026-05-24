@@ -52,7 +52,7 @@ export default function StatusLog({ entries }: StatusLogProps) {
 
   return (
     <footer style={{
-      height: 140,
+      height: 110,
       background: C.bgPanel,
       borderTop: `1px solid ${C.border}`,
       display: 'flex',
