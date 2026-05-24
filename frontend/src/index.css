@@ -5,11 +5,20 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   background-color: #03030a;
+  color: #e2e8f0;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
   color: #e2e8f0;
   font-family: 'Courier New', Courier, monospace;
 }
