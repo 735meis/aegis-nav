@@ -4,7 +4,7 @@ import './App.css'
 import SpaceGrid, { SolarSystemView, type HazardNode, type RouteNode } from './components/SpaceGrid'
 import StatusLog, { type LogEntry } from './components/StatusLog'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL ?? ''
 
 const C = {
   bg:      '#03030a',
