@@ -599,7 +599,7 @@ function MetricBig({ label, value, color, suffix, tipTitle, tipBody }: {
 
 // ── Why Quantum panel ─────────────────────────────────────────────────────────
 
-function WhyQuantumPanel({ waypoints, p3Time }: { waypoints: number; p3Time?: string }) {
+function WhyQuantumPanel({ p3Time }: { waypoints: number; p3Time?: string }) {
   // 50-bit search space represents the full routing problem (100×100 grid, hazard avoidance).
   // Classical speed: 10^12 ops/sec (modern GPU cluster / supercomputer).
   const n           = 50
