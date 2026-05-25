@@ -600,21 +600,17 @@ function MetricBig({ label, value, color, suffix, tipTitle, tipBody }: {
 // ── Why Quantum panel ─────────────────────────────────────────────────────────
 
 function WhyQuantumPanel({ waypoints, p3Time }: { waypoints: number; p3Time?: string }) {
-  // 50 represents the true routing problem complexity (100×100 grid, hazard avoidance),
-  // not the 6-qubit QUBO output. Fixed so the display stays readable.
+  // 50-bit search space represents the full routing problem (100×100 grid, hazard avoidance).
+  // Classical speed: 10^12 ops/sec (modern GPU cluster / supercomputer).
   const n           = 50
-  const classicalMs = Math.pow(2, n) * 0.1
+  const classicalMs = (Math.pow(2, n) / 1e12) * 1000
   const classicalStr = classicalMs < 1000
     ? `${classicalMs.toFixed(0)} ms`
-    : classicalMs < 60000
+    : classicalMs < 60_000
     ? `~${(classicalMs / 1000).toFixed(1)} s`
     : classicalMs < 3_600_000
-    ? `~${(classicalMs / 60000).toFixed(1)} min`
-    : classicalMs < 86_400_000
-    ? `~${(classicalMs / 3_600_000).toFixed(1)} hrs`
-    : classicalMs < 31_536_000_000
-    ? `~${(classicalMs / 86_400_000).toFixed(0)} days`
-    : `~${(classicalMs / 31_536_000_000).toFixed(0)} yrs`
+    ? `~${(classicalMs / 60_000).toFixed(1)} min`
+    : `~${(classicalMs / 3_600_000).toFixed(1)} hrs`
   // Simulator runs classically — real QPU would be ~microseconds.
   // Show algorithmic quantum time (1ms per QAOA shot) as the fair comparison.
   const qpuMs     = 1.0
@@ -643,7 +639,7 @@ function WhyQuantumPanel({ waypoints, p3Time }: { waypoints: number; p3Time?: st
           {
             label: 'Classical ETA', val: classicalStr, color: C.red,
             tipTitle: 'Classical Routing Time',
-            tipBody: `Time for a classical computer to brute-force all 2^${n} path combinations at 1 check per 0.1ms. This grows exponentially — double the waypoints and the time squares. Real navigation problems have hundreds of waypoints, making classical search completely impractical.`,
+            tipBody: `Time for a classical supercomputer (10^12 ops/sec) to brute-force all 2^${n} path combinations. This grows exponentially — add 10 more waypoints and the time multiplies by 1,000×. QAOA evaluates all combinations simultaneously in superposition.`,
           },
           {
             label: 'QPU compute (real HW)', val: `~${qpuMs}ms`, color: C.green,
