@@ -600,10 +600,9 @@ function MetricBig({ label, value, color, suffix, tipTitle, tipBody }: {
 // ── Why Quantum panel ─────────────────────────────────────────────────────────
 
 function WhyQuantumPanel({ waypoints, p3Time }: { waypoints: number; p3Time?: string }) {
-  // n represents the true routing problem complexity: choosing from a 100×100 grid
-  // with hazard avoidance across all sectors — not just the 6-qubit QUBO output size.
-  // The QUBO compresses this into 6 binary vars; the underlying search space is ~50 bits.
-  const n           = Math.max(waypoints * 7, 50)
+  // 50 represents the true routing problem complexity (100×100 grid, hazard avoidance),
+  // not the 6-qubit QUBO output. Fixed so the display stays readable.
+  const n           = 50
   const classicalMs = Math.pow(2, n) * 0.1
   const classicalStr = classicalMs < 1000
     ? `${classicalMs.toFixed(0)} ms`
