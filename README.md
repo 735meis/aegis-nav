@@ -1,6 +1,6 @@
 # AEGIS-NAV — Quantum Emergency Space Router
 
-> **Hackathon 2025 · Track 3: Systems Under Pressure**
+> **Hackathon 2026 · Track 3: Systems Under Pressure**
 > A fully on-board quantum navigation system that operates with zero uplink, classifying safe destinations, mapping real-world threats, and computing an evasion route in seconds.
 
 ---
